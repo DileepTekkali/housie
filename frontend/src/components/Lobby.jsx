@@ -61,7 +61,9 @@ export default function Lobby() {
   // The host's link carries the password (encoded) so guests join in one tap,
   // without typing it. Non-hosts can only share the plain code link.
   const pw = room.password;
-  const inviteLink = `${window.location.origin}?room=${room.code}${pw ? `&k=${btoa(encodeURIComponent(pw))}` : ''}`;
+  // Generate invite link with properly encoded password
+  const encodedPassword = pw ? btoa(encodeURIComponent(pw)) : '';
+  const inviteLink = `${window.location.origin}?room=${room.code}${encodedPassword ? `&k=${encodedPassword}` : ''}`;
 
   async function start() {
     setPref('sound', true);

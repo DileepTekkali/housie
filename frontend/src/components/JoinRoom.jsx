@@ -21,9 +21,20 @@ export default function JoinRoom() {
     const k = params.get('k');
     if (k) {
       try {
-        setPassword(decodeURIComponent(atob(k)));
+        // Correct order: first decode base64, then decode URL encoding
+        const password = decodeURIComponent(atob(k));
+        setPassword(password);
         setViaLink(true);
-      } catch { /* ignore */ }
+      } catch (e) {
+        // If decoding fails, clear any partial data and fallback to manual join
+        setPassword('');
+        setCode('');
+        setViaLink(false);
+      }
+    } else if (fromUrl) {
+      // If we have a room code from URL but no password, still set viaLink to true
+      // The user will just need to enter their name (no password needed)
+      setViaLink(true);
     }
   }, []);
 

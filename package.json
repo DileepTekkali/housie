@@ -1,0 +1,25 @@
+{
+  "name": "housie-live",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Housie Live — real-time, no-database Tambola/Housie web app",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n backend,frontend -c blue,magenta \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "node --watch backend/src/index.js",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "build": "npm --workspace frontend run build",
+    "start": "node backend/src/index.js",
+    "postinstall": "echo \"Run 'npm run dev' for development, or 'npm run build && npm start' for production.\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

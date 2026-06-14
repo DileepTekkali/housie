@@ -96,6 +96,11 @@ export function registerHandlers(io) {
     socket.on('room:join', (payload = {}, cb) => {
       const room = getRoom(payload.code);
       if (!room) return reply(cb, { ok: false, error: 'Room not found — check the code' });
+      // No new players once the game has started — only existing players can
+      // reconnect (via room:rejoin).
+      if (room.status !== 'lobby') {
+        return reply(cb, { ok: false, error: 'This room has already started — you can’t join now' });
+      }
       if (room.password && String(payload.password ?? '') !== room.password) {
         return reply(cb, { ok: false, error: 'Incorrect password' });
       }

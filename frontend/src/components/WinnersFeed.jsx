@@ -13,11 +13,13 @@ export default function WinnersFeed({ room }) {
               </span>
             </div>
             {p.winners.length > 0 && (
-              <div className="mt-1 flex flex-wrap gap-1.5">
+              <div className="mt-1 text-sm text-gold-200">
+                claimed by{' '}
                 {p.winners.map((w, i) => (
-                  <span key={i} className="chip bg-gold-400/15 text-gold-200">
+                  <span key={i}>
+                    {i > 0 ? ', ' : ''}
                     {p.qty > 1 ? `#${w.rank} ` : ''}
-                    {w.name} · 🎟️{w.ticketNumber}
+                    <span className="font-semibold">{w.name}</span>
                   </span>
                 ))}
               </div>

@@ -13,6 +13,7 @@ export default function JoinRoom() {
   const [password, setPassword] = useState('');
   const [viaLink, setViaLink] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -40,13 +41,20 @@ export default function JoinRoom() {
 
   async function submit(e) {
     e.preventDefault();
+    setError(null);
     if (!code.trim()) return pushToast('Enter the room code', 'error');
     if (!name.trim()) return pushToast('Enter your name', 'error');
     setBusy(true);
     const res = await joinRoom(code.trim().toUpperCase(), password, name.trim());
     setBusy(false);
-    if (!res.ok) pushToast(res.error || 'Could not join room', 'error');
+    if (!res.ok) {
+      setError(res.error || 'Could not join room');
+      pushToast(res.error || 'Could not join room', 'error');
+    }
   }
+
+  const ErrorBanner = () =>
+    error ? <div className="mb-4 rounded-xl border border-rose-400/40 bg-rose-500/15 p-3 text-center text-sm font-medium text-rose-200">{error}</div> : null;
 
   if (viaLink) {
     return (
@@ -55,7 +63,9 @@ export default function JoinRoom() {
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
           <h1 className="mb-1 text-center font-display text-3xl font-extrabold">Join room</h1>
           <p className="mb-6 text-center text-white/60">You’ve been invited — just enter your name to play.</p>
-          
+
+          <ErrorBanner />
+
           {/* Show the room code that was extracted from the URL */}
           {code && (
             <div className="mb-4 rounded-xl bg-black/25 p-3 text-center">
@@ -63,7 +73,7 @@ export default function JoinRoom() {
               <div className="font-display text-2xl font-bold tracking-widest text-gold-300">{code}</div>
             </div>
           )}
-          
+
           {/* Show password if it was extracted from the URL */}
           {password && (
             <div className="mb-4 rounded-xl bg-black/25 p-3 text-center">
@@ -71,11 +81,11 @@ export default function JoinRoom() {
               <div className="font-semibold text-gold-200">••••••••</div>
             </div>
           )}
-          
+
           <form onSubmit={submit} className="glass space-y-4 p-6">
             <div>
               <label className="label">Your name</label>
-              <input className="field" value={name} maxLength={24} placeholder="e.g. Arjun" autoFocus onChange={(e) => setName(e.target.value)} />
+              <input className="field" value={name} maxLength={24} placeholder="e.g. Shawnak" autoFocus onChange={(e) => setName(e.target.value)} />
             </div>
             <motion.button whileTap={{ scale: 0.97 }} className="btn-gold w-full text-lg" disabled={busy}>
               {busy ? 'Joining…' : 'Join room'}
@@ -93,6 +103,8 @@ export default function JoinRoom() {
         <h1 className="mb-1 text-center font-display text-3xl font-extrabold">Join a room</h1>
         <p className="mb-6 text-center text-white/60">Ask the host for the room code and password.</p>
 
+        <ErrorBanner />
+
         <form onSubmit={submit} className="glass space-y-4 p-6">
           <div>
             <label className="label">Room code</label>
@@ -108,7 +120,7 @@ export default function JoinRoom() {
           </div>
           <div>
             <label className="label">Your name</label>
-            <input className="field" value={name} maxLength={24} placeholder="e.g. Arjun" autoFocus onChange={(e) => setName(e.target.value)} />
+            <input className="field" value={name} maxLength={24} placeholder="e.g. Shawnak" autoFocus onChange={(e) => setName(e.target.value)} />
           </div>
           <div>
             <label className="label">Password</label>

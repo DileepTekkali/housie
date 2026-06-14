@@ -64,7 +64,7 @@ socket.on('prize:won', (data) => {
   const myId = store.session?.playerId || store.room?.you?.playerId;
   if (data.playerId === myId) return;
   const rank = data.rank > 1 ? ` (#${data.rank})` : '';
-  store.pushToast(`🏆 ${data.name} won ${data.label}${rank}!`, 'prize');
+  store.pushToast(`🏆 ${data.name} claimed ${data.label}${rank}!`, 'prize');
 });
 
 socket.on('room:state', (state) => {

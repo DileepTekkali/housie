@@ -65,7 +65,7 @@ export default function CreateRoom() {
             <div className="space-y-3">
               <div>
                 <label className="label">Your name (host)</label>
-                <input className="field" value={hostName} maxLength={24} placeholder="e.g. Priya" onChange={(e) => setHostName(e.target.value)} />
+                <input className="field" value={hostName} maxLength={24} placeholder="e.g. Yognya" onChange={(e) => setHostName(e.target.value)} />
               </div>
               <div>
                 <label className="label">Room password (optional)</label>

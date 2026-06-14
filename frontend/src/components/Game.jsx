@@ -73,28 +73,59 @@ export default function Game() {
           animate={{ opacity: 1, scale: 1 }}
           className="mb-4 rounded-3xl border border-gold-400/40 bg-gradient-to-br from-gold-400/15 to-rose-400/10 p-5 text-center"
         >
-          <div className="font-display text-3xl font-extrabold">🎉 Game over!</div>
-          <div className="mt-1 mb-4 text-white/70">Here are all the winners — well played, everyone!</div>
+          <div className="font-display text-3xl font-extrabold">🏆 Leaderboard</div>
+          <div className="mt-1 mb-4 text-white/70">Here’s who won what — well played, everyone!</div>
 
-          <div className="mx-auto grid max-w-2xl gap-2 text-left sm:grid-cols-2">
-            {room.prizes.map((p) => (
-              <div key={p.id} className="rounded-2xl bg-black/25 p-3">
-                <div className="mb-1 font-semibold text-gold-200">🏆 {p.label}</div>
-                {p.winners.length === 0 ? (
-                  <div className="text-sm text-white/45">Not won</div>
-                ) : (
-                  <div className="space-y-0.5">
-                    {p.winners.map((w, i) => (
-                      <div key={i} className="text-sm">
-                        {p.qty > 1 && <span className="text-white/45">#{w.rank} </span>}
-                        <span className="font-medium">{w.name}</span>
-                        <span className="text-white/45"> · ticket #{w.ticketNumber}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="mx-auto max-w-xl overflow-hidden rounded-2xl border border-white/10">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-black/30 text-white/55">
+                <tr>
+                  <th className="px-3 py-2 font-medium">#</th>
+                  <th className="px-3 py-2 font-medium">Player</th>
+                  <th className="px-3 py-2 font-medium">Prizes won</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  const byTicket = {};
+                  room.prizes.forEach((p) =>
+                    p.winners.forEach((w) => {
+                      const key = w.ticketNumber;
+                      if (!byTicket[key]) byTicket[key] = { name: w.name, ticketNumber: w.ticketNumber, prizes: [] };
+                      byTicket[key].prizes.push(p.qty > 1 ? `${p.label} #${w.rank}` : p.label);
+                    }),
+                  );
+                  const board = Object.values(byTicket).sort((a, b) => b.prizes.length - a.prizes.length);
+                  if (board.length === 0) {
+                    return (
+                      <tr>
+                        <td colSpan={3} className="px-3 py-4 text-center text-white/45">
+                          No prizes were claimed.
+                        </td>
+                      </tr>
+                    );
+                  }
+                  return board.map((row, i) => (
+                    <tr key={row.ticketNumber} className="border-t border-white/10">
+                      <td className="px-3 py-2 font-bold text-gold-300">{i + 1}</td>
+                      <td className="px-3 py-2">
+                        <span className="font-semibold">{row.name}</span>
+                        <span className="text-white/40"> · 🎟️{row.ticketNumber}</span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap gap-1">
+                          {row.prizes.map((pl, j) => (
+                            <span key={j} className="chip bg-gold-400/15 text-gold-200">
+                              {pl}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ));
+                })()}
+              </tbody>
+            </table>
           </div>
 
           <button className="btn-gold mt-5" onClick={leaveRoom}>

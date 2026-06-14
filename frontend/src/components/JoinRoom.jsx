@@ -54,7 +54,7 @@ export default function JoinRoom() {
         <ScreenHeader onBack={() => setView('landing', true)} />
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
           <h1 className="mb-1 text-center font-display text-3xl font-extrabold">Join room</h1>
-          <p className="mb-6 text-center text-white/60">You\'ve been invited — just enter your name to play.</p>
+          <p className="mb-6 text-center text-white/60">You’ve been invited — just enter your name to play.</p>
           
           {/* Show the room code that was extracted from the URL */}
           {code && (

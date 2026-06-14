@@ -1,13 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
-
-const EVENT_ICON = { prize: '🏆', join: '👋', leave: '🚪', game: '🎮', ticket: '🎟️', host: '✨', bogey: '🚫' };
-
 export default function WinnersFeed({ room }) {
-  const events = [...(room.events || [])].reverse();
-
   return (
     <div className="glass p-5">
-      <h2 className="mb-3 font-display text-lg font-bold">Prizes & activity</h2>
+      <h2 className="mb-3 font-display text-lg font-bold">Prizes</h2>
 
       <div className="space-y-1.5">
         {room.prizes.map((p) => (
@@ -30,26 +24,6 @@ export default function WinnersFeed({ room }) {
             )}
           </div>
         ))}
-      </div>
-
-      <div className="mt-4">
-        <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
-          <AnimatePresence initial={false}>
-            {events.map((e, i) => (
-              <motion.div
-                key={`${e.ts}-${i}`}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={`flex items-start gap-2 rounded-lg px-2 py-1.5 text-sm ${
-                  e.type === 'prize' ? 'bg-gold-400/10 text-gold-100' : 'text-white/65'
-                }`}
-              >
-                <span>{EVENT_ICON[e.type] || '•'}</span>
-                <span>{e.text}</span>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
       </div>
     </div>
   );

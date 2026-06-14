@@ -31,11 +31,15 @@ export default function App() {
 
     const params = new URLSearchParams(window.location.search);
     const store = useStore.getState();
+    const session = loadSession();
 
     if (params.has('create')) {
       store.setView('create');
     } else if (params.has('join') || params.has('room')) {
-      store.setView('join');
+      // If we have a saved session, the socket 'connect' handler rejoins that
+      // room and restores the SAME seat (no duplicate player). Only show the
+      // join form when there's nothing to restore.
+      if (!session) store.setView('join');
     }
 
     const onPop = () => {

@@ -134,10 +134,10 @@ export default function Lobby() {
             {isHost ? (
               <>
                 <motion.button whileTap={{ scale: 0.97 }} className="btn-gold w-full text-lg" disabled={busy} onClick={start}>
-                  {busy ? 'Starting…' : '▶ Start the game'}
+                  {busy ? 'Opening…' : '▶ Continue'}
                 </motion.button>
                 <p className="text-center text-xs text-white/45">
-                  {room.players.length} {room.players.length === 1 ? 'member' : 'members'} in the room — start whenever you’re ready.
+                  Opens the game board — you’ll press “Start game” there to begin calling numbers.
                 </p>
               </>
             ) : (

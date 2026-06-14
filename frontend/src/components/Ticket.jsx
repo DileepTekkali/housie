@@ -24,7 +24,6 @@ export default function Ticket({ ticket, room }) {
               return <div key={`${r}-${c}`} className="aspect-square rounded-md bg-white/5" />;
             }
             const isStruck = myMarks.has(cell);
-            const isCurrent = cell === room.currentNumber;
             return (
               <motion.button
                 key={`${r}-${c}`}
@@ -34,7 +33,7 @@ export default function Ticket({ ticket, room }) {
                 animate={isStruck ? { scale: [1.18, 1] } : { scale: 1 }}
                 className={`relative flex aspect-square items-center justify-center rounded-md font-display text-sm font-bold transition-colors sm:text-base ${
                   isStruck ? 'bg-gradient-to-br from-gold-300 to-gold-500 text-ink' : 'bg-white/90 text-ink/90'
-                } ${isCurrent && !isStruck ? 'ring-2 ring-gold-300' : ''}`}
+                }`}
               >
                 {cell}
                 {isStruck && (

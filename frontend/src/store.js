@@ -18,7 +18,8 @@ function saveStoredMarks(code, marks) {
 }
 
 function loadPrefs() {
-  const defaults = { sound: true, voice: false };
+  // Voice caller (numbers read aloud) is ON by default for everyone.
+  const defaults = { sound: true, voice: true };
   try {
     return { ...defaults, ...JSON.parse(localStorage.getItem(PREFS_KEY) || '{}') };
   } catch {
@@ -48,15 +49,20 @@ function syncUrl(view, roomCode, push) {
     case 'create':
       url.search = '?create';
       break;
-    case 'join':
-      if (roomCode) {
-        url.search = `?join&room=${roomCode}`;
-        const k = new URL(window.location).searchParams.get('k');
+    case 'join': {
+      // Preserve any room/password already in the URL (from an invite link) so
+      // the join screen can auto-fill them and only ask for a name.
+      const cur = new URL(window.location).searchParams;
+      const r = roomCode || cur.get('room');
+      if (r) {
+        url.search = `?join&room=${r}`;
+        const k = cur.get('k');
         if (k) url.searchParams.set('k', k);
       } else {
         url.search = '?join';
       }
       break;
+    }
     case 'lobby':
     case 'game':
       if (roomCode) url.search = `?room=${roomCode}`;

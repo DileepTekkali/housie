@@ -194,6 +194,22 @@ export function registerHandlers(io) {
       broadcastRoom(room);
     });
 
+    socket.on('host:beginCalling', (payload, cb) => {
+      const { room, error } = requireHost(socket);
+      if (error) return reply(cb, { ok: false, error });
+      const result = room.beginCalling();
+      reply(cb, result);
+      broadcastRoom(room);
+    });
+
+    socket.on('host:restart', (payload, cb) => {
+      const { room, error } = requireHost(socket);
+      if (error) return reply(cb, { ok: false, error });
+      const result = room.restart();
+      reply(cb, result);
+      broadcastRoom(room);
+    });
+
     socket.on('claim:submit', (payload = {}, cb) => {
       const { room, player } = ctx(socket);
       if (!room || !player) return reply(cb, { ok: false, error: 'You are not in a room' });

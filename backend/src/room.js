@@ -16,6 +16,7 @@ export class Room {
     this.settings = settings; // { ticketAssignment, calling, autoIntervalMs, ticketCount, maxTicketsPerPlayer, prizes:[{id,qty}] }
 
     this.status = 'lobby'; // lobby | running | paused | over
+    this.callingStarted = false; // numbers are only drawn after the host hits "Start game"
     // Tickets are generated on demand (one per player), so there's no fixed
     // pool size and nothing to "pick".
     this.tickets = {}; // ticketNumber -> grid
@@ -105,9 +106,36 @@ export class Room {
 
   start() {
     if (this.status !== 'lobby') return { ok: false, error: 'Game already started' };
-    // The host may start whenever they like, regardless of how many tickets
-    // have been picked.
+    // Move everyone into the game, but DON'T call any numbers yet — number
+    // calling begins only when the host presses "Start game" (beginCalling).
     this.status = 'running';
+    this.callingStarted = false;
+    this.touch();
+    return { ok: true };
+  }
+
+  // Begin number calling. Draws the first number immediately (no delay), then
+  // the auto-timer takes over if the host is in automatic mode.
+  beginCalling() {
+    if (this.status !== 'running') return { ok: false, error: 'Game is not active' };
+    if (this.callingStarted) return { ok: true };
+    this.callingStarted = true;
+    this.drawNumber(); // first number right away
+    this.startAuto(); // schedule the rest if auto; no-op in manual
+    this.touch();
+    return { ok: true };
+  }
+
+  // Reset for a fresh round (same players & tickets). Used by "Start new game"
+  // once a game is over — it begins calling straight away.
+  restart() {
+    this.called = [];
+    this.calledSet = new Set();
+    this.currentNumber = null;
+    this.prizes = this.prizes.map((p) => ({ ...p, winners: [] }));
+    this.status = 'running';
+    this.callingStarted = true;
+    this.drawNumber(); // first number right away
     this.startAuto();
     this.touch();
     return { ok: true };
@@ -135,9 +163,14 @@ export class Room {
     return n;
   }
 
-  startAuto() {
+  startAuto({ drawNow = false } = {}) {
     this.stopAuto();
     if (this.status !== 'running' || this.settings.calling !== 'auto') return;
+    // Draw the first number right away so there's no awkward initial delay.
+    if (drawNow) {
+      this.drawNumber();
+      if (this.broadcast) this.broadcast();
+    }
     this._timer = setInterval(() => {
       const n = this.drawNumber();
       if (n == null || this.status !== 'running') this.stopAuto();
@@ -153,9 +186,15 @@ export class Room {
   }
 
   setCalling(mode, intervalMs) {
+    const was = this.settings.calling;
     if (mode === 'auto' || mode === 'manual') this.settings.calling = mode;
     if (intervalMs) this.settings.autoIntervalMs = intervalMs;
-    if (this.status === 'running') this.startAuto(); // restart with new mode/interval
+    if (this.status === 'running' && this.callingStarted) {
+      // Draw immediately only when switching INTO auto (not when merely changing
+      // the speed), so adjusting the interval doesn't fire off extra numbers.
+      const switchingToAuto = this.settings.calling === 'auto' && was !== 'auto';
+      this.startAuto({ drawNow: switchingToAuto });
+    }
     this.touch();
     return { ok: true };
   }
@@ -314,6 +353,7 @@ export class Room {
     return {
       code: this.code,
       status: this.status,
+      callingStarted: this.callingStarted,
       hostId: this.host.id,
       settings: {
         calling: this.settings.calling,

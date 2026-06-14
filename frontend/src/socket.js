@@ -122,7 +122,9 @@ export const callNumber = () => request('host:call', {});
 export const setCalling = (mode, intervalMs) => request('host:setCalling', { mode, intervalMs });
 export const pauseGame = () => request('host:pause', {});
 export const resumeGame = () => request('host:resume', {});
+export const beginCalling = () => request('host:beginCalling', {});
 export const endGame = () => request('host:endGame', {});
+export const restartGame = () => request('host:restart', {});
 export const submitClaim = (ticketNumber, prizeId, marked) =>
   request('claim:submit', { ticketNumber, prizeId, marked });
 
